@@ -22,6 +22,14 @@ div {
   color: chocolate;
   font-weight: bold;
   font-family: "Courier New", Courier, monospace;
+  background: #ccc;
+  width: 100px;
+  height: 100px;
+  margin: 10px;
+  padding: 20px;
+  border: 2px #333 dashed;
+  border-radius: 100px;
+  line-height: 100px;
 }
 /* or */
 .class1,
@@ -31,6 +39,7 @@ div {
 /* sub */
 .class1 .class2 {
   color: yellowgreen;
+  text-align: center;
 }
 /*伪类*/
 .class1:hover {
@@ -49,4 +58,28 @@ div {
   .class1 {
     font-size: 70px;
   }
+}
+
+.position {
+  position: fixed;
+  top: 200px;
+  left: 300px;
+  width: 100px;
+  height: 100px;
+  background-color: #ccc;
+}
+.inline {
+  display: inline;
+  width: 100px;
+  height: 100px;
+}
+.inline-block {
+  display: inline-block;
+  width: 100px;
+  height: 100px;
+}
+.block {
+  display: block;
+  width: 100px;
+  height: 100px;
 }
