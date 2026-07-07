@@ -18,10 +18,32 @@ div {
 }
 /* and */
 .class1.class2 {
-  color: brown;
+  color: chocolate;
 }
 /* or */
 .class1,
 .class2 {
   color: blue;
+}
+/* sub */
+.class1 .class2 {
+  color: yellowgreen;
+}
+/*伪类*/
+.class1:hover {
+  font-size: 40px;
+}
+/*伪元素*/
+.class1::after {
+  content: "5";
+  color: red;
+  font-size: 14px;
+  position: relative;
+  top: -20px;
+}
+/* rwd */
+@media screen and (max-width: 768px) {
+  .class1 {
+    font-size: 70px;
+  }
 }
