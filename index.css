@@ -3,10 +3,11 @@ html {
 }
 /* tag */
 div {
-  color: brown;
+  color: brown; /*!important*/
 }
 /* id */
 #id {
+  color: darkblue;
 }
 /* class */
 .apple {
