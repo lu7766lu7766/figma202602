@@ -23,22 +23,42 @@
 // console.log(b[1])
 // null
 // undefined
-let a = 10
-let b = 20
+// let a = 10
+// let b = 20
 // let c = a
 // a = b
 // b = c
 // console.log(a, b)
 
 // > < == != >= <=
-if (a > b) {
-  // console.lo g("a is bigger")
-  console.log("a不等於b")
-} else {
-  // console.log("b is bigger")
-  console.log("a等於b")
-}
+// if (a > b) {
+//   // console.lo g("a is bigger")
+//   console.log("a不等於b")
+// } else {
+//   // console.log("b is bigger")
+//   console.log("a等於b")
+// }
 
 // 寫一個year變數，判斷該年份是否為閏年
-
+// let year = 2026
+// if ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0) {
+//   console.log("是閏年")
+// } else {
+//   console.log("不是閏年")
+// }
 // 寫三個變數x,y,z代表三角形三個邊長，判斷這三個邊長能否成為三角形
+// let x = 10
+// let y = 15
+// let z = 20
+// if (x + y > z && x + z > y && y + z > x) {
+//   console.log("可以構成三角形")
+// } else {
+//   console.log("不能構成三角形")
+// }
+// i = i + 1
+
+console.log("loop start")
+for (let i = 0; i < 10; i++) {
+  console.log(i)
+}
+console.log("loop end")
