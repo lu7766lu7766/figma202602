@@ -11,6 +11,7 @@
       }
     </style>
     <link rel="stylesheet" href="./index.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   </head>
   <body>
     <!-- <header>header</header> -->
@@ -162,5 +163,18 @@
         background-color: red;
       }
     </style>
+    <div class="w-scale">w-scale</div>
+    <style>
+      .w-scale {
+        width: 100px;
+        border: 1px solid black;
+        transition: width 3s ease-in-out;
+      }
+
+      .w-scale:hover {
+        width: 300px;
+      }
+    </style>
+    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-[10px]">Click me</button>
   </body>
 </html>
