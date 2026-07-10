@@ -23,6 +23,9 @@
 // console.log(b[1])
 // null
 // undefined
+let a = 10
+let b = 20
+
 // let a = 10
 // let b = 20
 // let c = a
@@ -58,7 +61,9 @@
 // i = i + 1
 
 console.log("loop start")
-for (let i = 0; i < 10; i++) {
-  console.log(i)
+let sum = 0
+for (let i = 1; i <= 10; i++) {
+  sum = sum + i
+  // console.log(l)
 }
-console.log("loop end")
+console.log("loop end", sum)

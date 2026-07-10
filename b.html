@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>幸運霓虹轉盤 Lucky Wheel</title>
+  <!-- 引入 Google Fonts Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  
+  <style>
+    /* 全域樣式與變數 */
+    :root {
+      --bg-gradient: radial-gradient(circle at center, #1e1b4b 0%, #090d16 100%);
+      --panel-bg: rgba(15, 23, 42, 0.65);
+      --panel-border: rgba(255, 255, 255, 0.08);
+      --neon-primary: #8b5cf6;
+      --neon-secondary: #ec4899;
+      --neon-accent: #10b981;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* 背景裝飾光暈 */
+    .bg-glow {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+      top: -100px;
+      left: -100px;
+      z-index: 0;
+      pointer-events: none;
+    }
+    
+    .bg-glow-2 {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(236, 72, 153, 0.12) 0%, rgba(0, 0, 0, 0) 70%);
+      bottom: -100px;
+      right: -100px;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* 主容器 */
+    .app-container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: row;
+      gap: 3rem;
+      max-width: 1200px;
+      width: 90%;
+      margin: 2rem auto;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @media (max-width: 968px) {
+      .app-container {
+        flex-direction: column-reverse;
+        gap: 2rem;
+        margin: 1rem auto;
+      }
+    }
+
+    /* 控制面板 */
+    .control-panel {
+      flex: 1;
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--panel-border);
+      border-radius: 24px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 450px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 
+                  inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .panel-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #a78bfa 0%, #f472b6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .panel-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    /* 輸入區樣式 */
+    .input-group {
+      margin-bottom: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+    }
+
+    .tags-container {
+      background: rgba(10, 15, 30, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 0.75rem;
+      min-height: 120px;
+      max-height: 200px;
+      overflow-y: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-content: flex-start;
+    }
+
+    .tag {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      border-radius: 8px;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      animation: fadeIn 0.2s ease-out;
+      transition: all 0.2s ease;
+    }
+
+    .tag:hover {
+      border-color: rgba(236, 72, 153, 0.6);
+      box-shadow: 0 0 8px rgba(236, 72, 153, 0.2);
+    }
+
+    .tag-remove {
+      cursor: pointer;
+      font-weight: bold;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      transition: color 0.2s;
+    }
+
+    .tag-remove:hover {
+      color: #ef4444;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    input[type="text"], input[type="number"] {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      color: white;
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    input[type="text"] {
+      flex: 1;
+    }
+
+    input[type="number"] {
+      width: 100%;
+    }
+
+    input[type="text"]:focus, input[type="number"]:focus {
+      border-color: var(--neon-primary);
+      box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+    }
+
+    .btn-add {
+      background: linear-gradient(135deg, var(--neon-primary) 0%, #7c3aed 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 0 1.25rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-add:hover {
+      filter: brightness(1.15);
+      box-shadow: 0 0 12px rgba(139, 92, 246, 0.4);
+    }
+
+    /* 開始按鈕 */
+    .btn-spin {
+      width: 100%;
+      background: linear-gradient(135deg, var(--neon-primary) 0%, var(--neon-secondary) 100%);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      padding: 1rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+      box-shadow: 0 8px 24px rgba(236, 72, 153, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-spin:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(236, 72, 153, 0.5),
+                  0 0 20px rgba(139, 92, 246, 0.4);
+    }
+
+    .btn-spin:active:not(:disabled) {
+      transform: translateY(1px);
+      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+    }
+
+    .btn-spin:disabled {
+      background: #334155;
+      color: #64748b;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    /* 轉盤顯示區 */
+    .wheel-column {
+      flex: 1.2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .wheel-outer-container {
+      position: relative;
+      width: 480px;
+      height: 480px;
+      border-radius: 50%;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5),
+                  0 0 50px rgba(139, 92, 246, 0.15);
+      padding: 10px;
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    @media (max-width: 540px) {
+      .wheel-outer-container {
+        width: 320px;
+        height: 320px;
+        padding: 6px;
+      }
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+
+    /* 指針樣式 */
+    .wheel-pointer {
+      position: absolute;
+      top: -5px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 34px;
+      height: 45px;
+      z-index: 10;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+      transform-origin: 50% 10px;
+      transition: transform 0.05s ease-out; /* 快速回彈 */
+    }
+
+    /* 指針物理晃動動畫 */
+    .wheel-pointer.tick-active {
+      transform: translateX(-50%) rotate(-18deg);
+    }
+
+    .wheel-pointer-svg {
+      fill: #ef4444;
+      stroke: #ffffff;
+      stroke-width: 2.5;
+      filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.8));
+    }
+
+    /* 得獎彈出 Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(5, 8, 16, 0.8);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: rgba(20, 26, 45, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 
+                  0 0 30px rgba(139, 92, 246, 0.3);
+      border-radius: 24px;
+      padding: 3rem 2rem;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      transform: scale(0.85) translateY(20px);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-icon {
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+      display: inline-block;
+      animation: bounce 1s infinite alternate;
+    }
+
+    .modal-title {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-result {
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin-bottom: 2rem;
+      background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 15px rgba(52, 211, 153, 0.2);
+    }
+
+    .btn-close {
+      background: rgba(255, 255, 255, 0.08);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 0.75rem 2rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-close:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Confetti Canvas */
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 99;
+    }
+
+    /* 動畫效果 */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes bounce {
+      from { transform: translateY(0); }
+      to { transform: translateY(-10px); }
+    }
+
+    /* 捲軸樣式優化 */
+    .tags-container::-webkit-scrollbar {
+      width: 6px;
+    }
+    .tags-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .tags-container::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+    }
+    .tags-container::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-glow"></div>
+  <div class="bg-glow-2"></div>
+
+  <!-- 全螢幕 Confetti 畫布 -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <div class="app-container">
+    
+    <!-- 左側：輸入與控制面板 -->
+    <div class="control-panel">
+      <h1 class="panel-title">幸運霓虹轉盤</h1>
+      <p class="panel-subtitle">自訂專屬選項，拉起霓虹幸運之夜</p>
+      
+      <!-- 選項輸入 -->
+      <div class="input-group">
+        <label>目前選項</label>
+        <div class="tags-container" id="tags-container">
+          <!-- 標籤將由 JS 動態生成 -->
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="new-option">新增選項</label>
+        <div class="input-row">
+          <input type="text" id="new-option" placeholder="輸入選項名稱..." maxlength="15">
+          <button class="btn-add" id="btn-add">新增</button>
+        </div>
+      </div>
+
+      <!-- 秒數輸入 -->
+      <div class="input-group">
+        <label for="spin-duration">旋轉時間 (秒)</label>
+        <input type="number" id="spin-duration" min="1" max="30" value="5">
+      </div>
+
+      <!-- 開始按鈕 -->
+      <button class="btn-spin" id="btn-spin">SPIN!</button>
+    </div>
+
+    <!-- 右側：轉盤顯示區 -->
+    <div class="wheel-column">
+      <div class="wheel-outer-container">
+        <!-- 頂部指針 -->
+        <div class="wheel-pointer" id="wheel-pointer">
+          <svg class="wheel-pointer-svg" viewBox="0 0 30 40" width="100%" height="100%">
+            <polygon points="15,40 2,5 28,5" />
+            <circle cx="15" cy="8" r="4" fill="#ffffff" />
+          </svg>
+        </div>
+        
+        <!-- 轉盤畫布 -->
+        <canvas id="wheel-canvas"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 結果彈出視窗 -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal-card">
+      <span class="modal-icon">🎉</span>
+      <h3 class="modal-title">幸運降臨</h3>
+      <div class="modal-result" id="modal-result">項目名稱</div>
+      <button class="btn-close" id="btn-close">太棒了！</button>
+    </div>
+  </div>
+
+  <script>
+    // 預設選項列表
+    let options = ['披薩 🍕', '火鍋 🍲', '漢堡 🍔', '拉麵 🍜', '壽司 🍣', '牛排 🥩', '便當 🍱', '沙拉 🥗'];
+    
+    // 美麗的霓虹配色（共 8 色，可循環使用）
+    const COLORS = [
+      '#6366f1', // Indigo
+      '#ec4899', // Pink
+      '#10b981', // Emerald
+      '#f59e0b', // Amber
+      '#3b82f6', // Blue
+      '#8b5cf6', // Violet
+      '#06b6d4', // Cyan
+      '#ef4444'  // Red
+    ];
+
+    // DOM 元素選取
+    const tagsContainer = document.getElementById('tags-container');
+    const newOptionInput = document.getElementById('new-option');
+    const btnAdd = document.getElementById('btn-add');
+    const spinDurationInput = document.getElementById('spin-duration');
+    const btnSpin = document.getElementById('btn-spin');
+    const canvas = document.getElementById('wheel-canvas');
+    const ctx = canvas.getContext('2d');
+    const pointer = document.getElementById('wheel-pointer');
+    const modalOverlay = document.getElementById('modal-overlay');
+    const modalResult = document.getElementById('modal-result');
+    const btnClose = document.getElementById('btn-close');
+    const confettiCanvas = document.getElementById('confetti-canvas');
+
+    // 轉盤狀態變數
+    let currentRotation = 0; // 弧度
+    let isSpinning = false;
+    let lastSectorIndex = -1;
+
+    // 1. 初始化與更新選項標籤
+    function updateTags() {
+      tagsContainer.innerHTML = '';
+      options.forEach((opt, index) => {
+        const tag = document.createElement('div');
+        tag.className = 'tag';
+        tag.innerHTML = `
+          <span>${opt}</span>
+          <span class="tag-remove" onclick="removeOption(${index})">&times;</span>
+        `;
+        tagsContainer.appendChild(tag);
+      });
+      // 重新繪製轉盤
+      drawWheel(0);
+    }
+
+    window.removeOption = function(index) {
+      if (isSpinning) return;
+      if (options.length <= 2) {
+        alert('轉盤最少需要有 2 個選項喔！');
+        return;
+      }
+      options.splice(index, 1);
+      updateTags();
+    };
+
+    function addOption() {
+      if (isSpinning) return;
+      const val = newOptionInput.value.trim();
+      if (!val) return;
+      if (options.includes(val)) {
+        alert('該選項已經存在囉！');
+        return;
+      }
+      options.push(val);
+      newOptionInput.value = '';
+      updateTags();
+      // 捲動到標籤區底部
+      tagsContainer.scrollTop = tagsContainer.scrollHeight;
+    }
+
+    btnAdd.addEventListener('click', addOption);
+    newOptionInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') addOption();
+    });
+
+    // 2. Canvas 繪製轉盤邏輯
+    function drawWheel(rotationRad) {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      
+      // 適配高解析度螢幕
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+
+      const width = rect.width;
+      const height = rect.height;
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const radius = Math.min(width, height) / 2 - 18;
+
+      ctx.clearRect(0, 0, width, height);
+
+      // (A) 繪製最外圍的底座圓形與發光陰影
+      ctx.shadowColor = 'rgba(139, 92, 246, 0.4)';
+      ctx.shadowBlur = 18;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius + 10, 0, 2 * Math.PI);
+      ctx.fillStyle = '#0f172a';
+      ctx.fill();
+      ctx.shadowBlur = 0; // 關閉陰影，避免干擾內圈
+
+      // (B) 繪製裝飾性的 LED 燈 (保持靜止)
+      const ledCount = 24;
+      // 根據目前時間做閃爍，每 200 毫秒變動一次
+      const ledOffset = Math.floor(Date.now() / 200) % 2;
+      for (let j = 0; j < ledCount; j++) {
+        const angle = (j * (360 / ledCount)) * Math.PI / 180;
+        const ledX = centerX + (radius + 5) * Math.cos(angle);
+        const ledY = centerY + (radius + 5) * Math.sin(angle);
+        
+        ctx.beginPath();
+        ctx.arc(ledX, ledY, 3.5, 0, 2 * Math.PI);
+        
+        if ((j + ledOffset) % 2 === 0) {
+          ctx.fillStyle = '#fbbf24'; // 發光黃色
+          ctx.shadowColor = '#fbbf24';
+          ctx.shadowBlur = 6;
+        } else {
+          ctx.fillStyle = '#78350f'; // 暗黃色
+          ctx.shadowBlur = 0;
+        }
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+
+      // (C) 繪製旋轉部分的轉盤 (扇形與文字)
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.rotate(rotationRad);
+
+      const N = options.length;
+      const anglePerSector = (2 * Math.PI) / N;
+
+      for (let i = 0; i < N; i++) {
+        const startAngle = i * anglePerSector;
+        const endAngle = (i + 1) * anglePerSector;
+
+        // 繪製扇形
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, radius, startAngle, endAngle);
+        ctx.closePath();
+        ctx.fillStyle = COLORS[i % COLORS.length];
+        ctx.fill();
+
+        // 扇形格線
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = 'rgba(15, 23, 42, 0.4)';
+        ctx.stroke();
+
+        // 繪製文字
+        ctx.save();
+        const middleAngle = startAngle + anglePerSector / 2;
+        ctx.rotate(middleAngle);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 15px "Outfit", "Inter", sans-serif';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+        ctx.shadowBlur = 4;
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        
+        // 限制最大字寬以防止溢出
+        const maxTextWidth = radius * 0.65;
+        ctx.fillText(options[i], radius - 25, 0, maxTextWidth);
+        ctx.restore();
+      }
+
+      ctx.restore();
+
+      // (D) 繪製中心蓋 (Center Cap)
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+      ctx.shadowBlur = 10;
+      
+      // 外環
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, 24, 0, 2 * Math.PI);
+      ctx.fillStyle = '#1e1b4b';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+      ctx.lineWidth = 2;
+      ctx.fill();
+      ctx.stroke();
+
+      // 內核
+      const centerGradient = ctx.createRadialGradient(centerX, centerY, 2, centerX, centerY, 16);
+      centerGradient.addColorStop(0, '#f472b6');
+      centerGradient.addColorStop(1, '#8b5cf6');
+      
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, 16, 0, 2 * Math.PI);
+      ctx.fillStyle = centerGradient;
+      ctx.fill();
+      
+      ctx.shadowBlur = 0;
+    }
+
+    // 視窗縮放時自適應繪製
+    window.addEventListener('resize', () => drawWheel(currentRotation));
+
+    // 3. Easing 函數：由慢到快，再漸漸停下來 (Quintic Ease In Out)
+    function easeInOutQuint(t) {
+      return t < 0.5 ? 16 * t * t * t * t * t : 1 - Math.pow(-2 * t + 2, 5) / 2;
+    }
+
+    // 4. SPIN 旋轉邏輯
+    function spin() {
+      if (isSpinning || options.length === 0) return;
+
+      isSpinning = true;
+      toggleControls(true);
+
+      const durationSec = parseFloat(spinDurationInput.value) || 5;
+      const durationMs = durationSec * 1000;
+      
+      const N = options.length;
+      const sliceDeg = 360 / N;
+
+      // 隨機決定中獎的項目索引 (0 ~ N-1)
+      const winIndex = Math.floor(Math.random() * N);
+      
+      // 計算該區塊在轉盤上的起訖角度 (以度數計算，Canvas 中第 0 區塊是從 0 度順時針展開)
+      const sectorMin = winIndex * sliceDeg;
+      const sectorMax = (winIndex + 1) * sliceDeg;
+      // 取其中間略帶隨機偏移的位置 (避開邊界以防指針尷尬)，介於 15% 到 85% 之間
+      const randomOffset = 0.15 + Math.random() * 0.7;
+      const targetAngleInSector = sectorMin + randomOffset * sliceDeg;
+      
+      // 我們指針在 12 點鐘方向 (270度)。
+      // 停止時，指針指向的角度應該剛好落在該區塊上。
+      // 計算要轉多少度才能讓 targetAngleInSector 停在 270 度位置。
+      const stopAngle = (270 - targetAngleInSector + 360) % 360;
+
+      // 當前旋轉總角度
+      const currentRotationDeg = (currentRotation * 180 / Math.PI);
+      
+      // 最小旋轉圈數，根據秒數動態調整（秒數越長轉越多圈，更合理）
+      const minRounds = Math.max(3, Math.floor(durationSec * 1.5));
+      const targetRotationDeg = currentRotationDeg + (minRounds * 360) + ((stopAngle - (currentRotationDeg % 360) + 360) % 360);
+      
+      const startRotationRad = currentRotation;
+      const targetRotationRad = targetRotationDeg * Math.PI / 180;
+      
+      const startTime = performance.now();
+      lastSectorIndex = -1;
+
+      function animate(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / durationMs, 1);
+        
+        // 取得 Easing 後的進度，並計算當前旋轉弧度
+        const easedProgress = easeInOutQuint(progress);
+        currentRotation = startRotationRad + (targetRotationRad - startRotationRad) * easedProgress;
+
+        // 重新繪製轉盤 (帶入當前弧度)
+        drawWheel(currentRotation);
+
+        // --- 指針實體 Ticking 物理晃動偵測 ---
+        // 指針在 12 點鐘 (270度)，求此時指針對應到轉盤上的度數
+        const currentRotationDeg = currentRotation * 180 / Math.PI;
+        const pointerRelativeDeg = (270 - (currentRotationDeg % 360) + 360) % 360;
+        const currentSectorIndex = Math.floor(pointerRelativeDeg / sliceDeg);
+
+        if (currentSectorIndex !== lastSectorIndex) {
+          lastSectorIndex = currentSectorIndex;
+          // 高速旋轉時頻率高，低速時頻率低。觸發指針震動效果
+          triggerPointerTick();
+        }
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          // 旋轉結束
+          isSpinning = false;
+          toggleControls(false);
+          
+          // 確保最終角度精確
+          currentRotation = targetRotationRad;
+          drawWheel(currentRotation);
+
+          // 獲取中獎結果
+          const winnerText = options[winIndex];
+          showWinner(winnerText);
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    // 觸發指針擺動
+    function triggerPointerTick() {
+      // 移除再新增以重置 CSS transition/animation
+      pointer.classList.remove('tick-active');
+      // 強制重繪
+      void pointer.offsetWidth;
+      pointer.classList.add('tick-active');
+      
+      // 50ms 後將其回彈
+      setTimeout(() => {
+        pointer.classList.remove('tick-active');
+      }, 50);
+    }
+
+    // 禁用/啟用輸入與按鈕
+    function toggleControls(disable) {
+      btnSpin.disabled = disable;
+      btnAdd.disabled = disable;
+      newOptionInput.disabled = disable;
+      spinDurationInput.disabled = disable;
+      
+      // 轉動中移除所有 tag 上的刪除按鈕功能
+      const removes = document.querySelectorAll('.tag-remove');
+      removes.forEach(btn => {
+        btn.style.opacity = disable ? '0.3' : '1';
+        btn.style.pointerEvents = disable ? 'none' : 'auto';
+      });
+    }
+
+    // 5. 顯示得獎視窗與 Confetti 慶祝
+    function showWinner(name) {
+      modalResult.innerText = name;
+      modalOverlay.classList.add('active');
+      startConfetti();
+    }
+
+    // 關閉 Modal
+    btnClose.addEventListener('click', () => {
+      modalOverlay.classList.remove('active');
+      stopConfetti();
+    });
+
+    // 點選遮罩也能關閉
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) {
+        modalOverlay.classList.remove('active');
+        stopConfetti();
+      }
+    });
+
+    // 開始旋轉按鈕點擊事件
+    btnSpin.addEventListener('click', spin);
+
+    // 6. Confetti 彩帶特效系統 (純 JS / Canvas)
+    let confettiActive = false;
+    let confettiParticles = [];
+    const confettiColors = ['#f43f5e', '#3b82f6', '#10b981', '#fbbf24', '#8b5cf6', '#ec4899', '#06b6d4'];
+
+    class ConfettiParticle {
+      constructor(w, h) {
+        this.w = w;
+        this.h = h;
+        this.x = Math.random() * w;
+        this.y = Math.random() * -h - 20; // 從螢幕上方隨機高度降落
+        this.size = Math.random() * 8 + 6;
+        this.color = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+        this.speedX = Math.random() * 4 - 2;
+        this.speedY = Math.random() * 5 + 4;
+        this.rotation = Math.random() * 360;
+        this.rotationSpeed = Math.random() * 4 - 2;
+      }
+
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.rotation += this.rotationSpeed;
+        
+        // 若飄出螢幕，則重置回上方
+        if (this.y > this.h) {
+          this.y = -20;
+          this.x = Math.random() * this.w;
+        }
+      }
+
+      draw(cCtx) {
+        cCtx.save();
+        cCtx.translate(this.x, this.y);
+        cCtx.rotate(this.rotation * Math.PI / 180);
+        cCtx.fillStyle = this.color;
+        // 繪製矩形小碎片
+        cCtx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size / 2);
+        cCtx.restore();
+      }
+    }
+
+    function resizeConfetti() {
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
+    }
+
+    function confettiLoop() {
+      if (!confettiActive) return;
+      
+      const cCtx = confettiCanvas.getContext('2d');
+      cCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      
+      confettiParticles.forEach(p => {
+        p.update();
+        p.draw(cCtx);
+      });
+
+      requestAnimationFrame(confettiLoop);
+    }
+
+    function startConfetti() {
+      resizeConfetti();
+      confettiParticles = [];
+      confettiActive = true;
+      
+      const particleCount = 120;
+      for (let i = 0; i < particleCount; i++) {
+        confettiParticles.push(new ConfettiParticle(confettiCanvas.width, confettiCanvas.height));
+      }
+      
+      window.addEventListener('resize', resizeConfetti);
+      confettiLoop();
+    }
+
+    function stopConfetti() {
+      confettiActive = false;
+      const cCtx = confettiCanvas.getContext('2d');
+      cCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      window.removeEventListener('resize', resizeConfetti);
+    }
+
+    // 7. 首次加載渲染
+    updateTags();
+
+    // 讓 LED 燈在靜止時也能緩慢閃爍動畫
+    setInterval(() => {
+      if (!isSpinning) {
+        drawWheel(currentRotation);
+      }
+    }, 200);
+  </script>
+</body>
+</html>
