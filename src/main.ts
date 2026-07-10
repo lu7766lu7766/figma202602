@@ -60,10 +60,36 @@ let b = 20
 // }
 // i = i + 1
 
-console.log("loop start")
-let sum = 0
-for (let i = 1; i <= 10; i++) {
-  sum = sum + i
-  // console.log(l)
+// console.log("loop start")
+// let sum = 0
+// for (let i = 1; i <= 10; i++) {
+//   sum = sum + i
+//   // console.log(l)
+// }
+// console.log("loop end", sum)
+
+// let method = function() { }
+// let callA = (a: string) => {
+//   console.log(a + " A")
+// }
+// callA("hello")
+// let add = (a: number, b: number) => {
+//   // console.log(a + b)
+//   return a + b
+// }
+// let aplusb = add(10, 20)
+// console.log(aplusb)
+// markdown
+// let compareAB = (a: number, b: number) => {
+//   // if (a > b) {
+//   //   return a
+//   // } else {
+//   //   return b
+//   // }
+//   return a > b ? a : b
+// }
+// console.log(compareAB(8, 9))
+let countBMI = (height: number, weight: number) => {
+  return weight / (height * height)
 }
-console.log("loop end", sum)
+console.log(countBMI(1.73, 80))
