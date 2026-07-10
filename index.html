@@ -26,7 +26,7 @@
     <a href="/a.html">google<img src="./images/image.webp" /></a>
 
     <div><input type="text" />text</div>
-    <div>
+    <div class="transparent">
       <label name="fr"><input type="checkbox" name="fr" />蘋果</label>
       <label name="fr"><input type="checkbox" name="fr" />鳳梨 </label>
       <label name="fr"><input type="checkbox" name="fr" />香蕉 </label>
@@ -110,5 +110,57 @@
     <div class="class1">
       <div class="class2">sub</div>
     </div>
+    <div class="card">
+      <p class="title">Title</p>
+    </div>
+    <style>
+      .card {
+        font-size: 20px;
+      }
+      .title {
+        font-size: 1.2rem;
+      } /* 20px * 1.2 = 24px */
+      .half {
+        width: 50%;
+      } /* 200px */
+      .hero {
+        height: 100vh; /* 滿版高度 */
+        padding: 5vw; /* 視窗越大 padding 越大 */
+      }
+      /* html {
+        font-size: 5vw;
+      } */
+    </style>
+    <div>Normal</div>
+    <div class="rotated">Rotated</div>
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <div class="scale">Scale</div>
+    <div class="translate">Translate</div>
+    <style>
+      div {
+        width: 80px;
+        height: 80px;
+        background-color: skyblue;
+      }
+
+      .rotated {
+        transform: rotate(45deg); /* Equal to rotateZ(45deg) */
+        background-color: pink;
+      }
+
+      .scale {
+        transform: scale(2, 2);
+        background-color: green;
+      }
+
+      .translate {
+        transform: translate(100px, 300px);
+        background-color: red;
+      }
+    </style>
   </body>
 </html>

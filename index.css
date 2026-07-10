@@ -62,8 +62,8 @@ div {
 
 .position {
   position: fixed;
-  top: 200px;
-  left: 300px;
+  top: 50%;
+  left: 50%;
   width: 100px;
   height: 100px;
   background-color: #ccc;
@@ -82,4 +82,10 @@ div {
   display: block;
   width: 100px;
   height: 100px;
+}
+.hidden {
+  display: none;
+}
+.transparent {
+  visibility: hidden;
 }
