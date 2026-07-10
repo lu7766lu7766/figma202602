@@ -25,5 +25,20 @@
 // undefined
 let a = 10
 let b = 20
+// let c = a
+// a = b
+// b = c
+// console.log(a, b)
 
-console.log(a, b)
+// > < == != >= <=
+if (a > b) {
+  // console.lo g("a is bigger")
+  console.log("a不等於b")
+} else {
+  // console.log("b is bigger")
+  console.log("a等於b")
+}
+
+// 寫一個year變數，判斷該年份是否為閏年
+
+// 寫三個變數x,y,z代表三角形三個邊長，判斷這三個邊長能否成為三角形
